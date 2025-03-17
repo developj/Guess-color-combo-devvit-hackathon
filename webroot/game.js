@@ -14,7 +14,7 @@ class ColorGame {
   
       this.renderGame();
   
-      document.getElementById("restart").addEventListener("click", () => this.resetGame());
+      document.getElementById("restart").addEventListener("click", () => this.restartGame());
   
       window.addEventListener("message", this.handleMessage.bind(this));
   
@@ -63,7 +63,7 @@ class ColorGame {
     }
   
     handleGuess(selectedColor) {
-      if (JSON.stringify(selectedColor) === JSON.stringify(this.targetColor)) {
+      if ((JSON.stringify(selectedColor) === JSON.stringify(this.targetColor)) && this.attempts < 2) {
         this.score += this.attempts === 0 ? 10 : 5;
         this.messageElement.textContent = "🎉 Correct! Next round!";
         this.scoreElement.textContent = this.score;
@@ -82,6 +82,11 @@ class ColorGame {
       this.attempts = 0;
       this.targetColor = this.generateRandomColor();
       this.renderGame();
+    }
+
+    restartGame(){
+     this.score = 0
+     this.renderGame()
     }
   
     postMessage(msg) {
