@@ -1,6 +1,7 @@
 import "./createPost.js";
 import { Devvit, useState, useWebView } from "@devvit/public-api";
 import type { DevvitMessage, WebViewMessage } from "./message.js";
+import { getLeaderBoard } from "./leaderboard.js";
 
 Devvit.configure({
   redditAPI: true,
@@ -12,7 +13,9 @@ Devvit.addCustomPostType({
   name: "RGB Color Breakdown Game",
   height: "tall",
   render: (context) => {
+    const { reddit, redis, postId } = context;
     const [score, setScore] = useState(0);
+    const leaderboard = getLeaderBoard(redis,reddit,postId);
 
     const webView = useWebView<WebViewMessage, DevvitMessage>({
       url: "index.html", // The webview game

@@ -1,7 +1,7 @@
 import { RedditAPIClient, RedisClient } from "@devvit/public-api";
 
 export type LEADER_BOARD_ITEM = {
-  score: string | number;
+  score: number;
   currentUserLeaderBoardID: string;
   userName: string;
 };
@@ -48,19 +48,73 @@ export const getLeaderBoard = async (
 ): Promise<LEADER_BOARD> => {
   const leaderBoardName = await getLeaderBoardName(reddit, postId);
   const leaderBoard = await redis.get(leaderBoardName);
-  if(!leaderBoard){
+  if (!leaderBoard) {
     return [];
   }
   const result: LEADER_BOARD = JSON.parse(leaderBoard);
   return result || [];
 };
 
+export const createLeaderBoard = async (
+  redis: RedisClient,
+  reddit: RedditAPIClient,
+  postId?: string | undefined
+) => {
+  const leaderBoardName = await getLeaderBoardName(reddit, postId);
+  await redis.set(leaderBoardName, JSON.stringify([]));
+};
 
-export const createLeaderBoard= async(
-    redis: RedisClient,
-    reddit: RedditAPIClient,
-    postId?: string | undefined
-  )=>{
-    const leaderBoardName = await getLeaderBoardName(reddit, postId);
-    await redis.set(leaderBoardName,JSON.stringify([]));
-}
+export const addOrUpdateScore = (
+  currentLeaderBoard: LEADER_BOARD,
+  updateItem: LEADER_BOARD_ITEM
+): LEADER_BOARD => {
+  const existingIndex = currentLeaderBoard?.findIndex(
+    (item) =>
+      item.currentUserLeaderBoardID === updateItem.currentUserLeaderBoardID
+  );
+
+  let state: "update" | "add" | "replace" | "ignore";
+  if (existingIndex !== -1) {
+    state = "update";
+  } else if (currentLeaderBoard.length < 200) {
+    state = "add";
+  } else {
+    const minScoreItem = currentLeaderBoard?.reduce((min, item) =>
+      item.score < min.score ? item : min
+    );
+    if (updateItem.score > minScoreItem.score) {
+      state = "replace";
+    } else {
+      state = "ignore";
+    }
+  }
+
+  switch (state) {
+    case "update":
+      currentLeaderBoard[existingIndex].score = updateItem.score;
+      break;
+    case "add":
+      currentLeaderBoard.push(updateItem);
+      break;
+    case "replace":
+      const minScoreItem = currentLeaderBoard?.reduce((min, item) =>
+        item.score < min.score ? item : min
+      );
+      const minIndex = currentLeaderBoard?.findIndex(
+        (item) =>
+          item.currentUserLeaderBoardID ===
+          minScoreItem.currentUserLeaderBoardID
+      );
+      currentLeaderBoard?.splice(minIndex, 1, updateItem);
+      break;
+    case "ignore":
+      // Do nothing
+      break;
+
+    default:
+      break;
+  }
+
+  currentLeaderBoard?.sort((a, b) => b.score - a.score);
+  return currentLeaderBoard;
+};
