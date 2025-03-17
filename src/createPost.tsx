@@ -1,5 +1,5 @@
 import { Devvit } from "@devvit/public-api";
-import { createLeaderBoard } from "./leaderboard.js";
+import { createLeaderBoard } from "./leaderboardHelpers.js";
 
 // Adds a new menu item to the subreddit allowing users to create a game post
 Devvit.addMenuItem({
@@ -8,7 +8,7 @@ Devvit.addMenuItem({
   onPress: async (_event, context) => {
     const { reddit, ui, postId, redis } = context;
     await createLeaderBoard(redis,reddit,postId);
-    
+
     const subreddit = await reddit.getCurrentSubreddit();
     const post = await reddit.submitPost({
       title: "🎨 Can You Guess the Color Breakdown?",
