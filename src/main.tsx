@@ -12,10 +12,12 @@ Devvit.configure({
 Devvit.addCustomPostType({
   name: "RGB Color Breakdown Game",
   height: "tall",
-  render:(context) => {
+  render: (context) => {
     const { reddit, redis, postId } = context;
     const [score, setScore] = useState(0);
-    const [currentLeaderBoard, setCurrentLeaderBoard] = useState(async()=>  await getLeaderBoard(redis,reddit,postId));
+    const [currentLeaderBoard, setCurrentLeaderBoard] = useState(
+      async () => await getLeaderBoard(redis, reddit, postId)
+    );
 
     const webView = useWebView<WebViewMessage, DevvitMessage>({
       url: "index.html", // The webview game
@@ -41,16 +43,34 @@ Devvit.addCustomPostType({
     });
 
     return (
-      <vstack grow padding="medium">
-        <vstack grow alignment="middle center">
-          <text size="xlarge" weight="bold">
-            🎨 RGB Color Breakdown Game
-          </text>
-          <spacer />
-          <vstack alignment="start middle">
-            <text size="medium">🏆 Current Score: {score}</text>
-            <button onPress={() => webView.mount()}>Start Game</button>
+      <vstack backgroundColor="#2E3192" grow padding="medium">
+        <zstack grow alignment="top center" width="100%" height="100%">
+          <image
+            url="colorCombo.jpg"
+            width="100%"
+            height="100%"
+            imageWidth={300}
+            imageHeight={250}
+            description="Play Guess Color Combo"
+          />
+          <vstack grow padding="medium" />
+          <vstack
+            backgroundColor="rgba(0, 0, 0, 0.6)"
+            padding="medium"
+            grow
+            cornerRadius="small"
+            alignment="middle center"
+          >
+            <text color="#fff" size="xxlarge" weight="bold">
+               🏆 Current Score: {score}
+            </text>
+            <spacer />
           </vstack>
+        </zstack>
+        <vstack grow alignment="middle center" padding="medium">
+          <button size="large" width={50} onPress={() => webView.mount()}>
+            Start Game
+          </button>
         </vstack>
       </vstack>
     );
