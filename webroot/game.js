@@ -1,3 +1,6 @@
+/** @typedef {import('../src/message.ts').DevvitSystemMessage} DevvitSystemMessage */
+/** @typedef {import('../src/message.ts').WebViewMessage} WebViewMessage */
+
 /**
  * Represents a Color Guessing Game where users guess the RGB components of a displayed color.
  */
@@ -9,8 +12,11 @@ class ColorGame {
       this.attempts = 0;
       /** @type {number[]} The target RGB color to guess */
       this.targetColor = this.generateRandomColor();
-  
-      this.init();
+
+      // When the Devvit app sends a message with `postMessage()`, this will be triggered
+       addEventListener('message', this.#onMessage);
+
+       this.init();
     }
   
     /**
@@ -36,7 +42,10 @@ class ColorGame {
   
       window.addEventListener("message", this.handleMessage.bind(this));
       
-      this.postMessage({ type: "webViewReady" });
+       // This event gets called when the web view is loaded
+       addEventListener('load', () => {
+        this.postMessage({ type: 'webViewReady' });
+      });
     }
   
     /**
@@ -107,7 +116,7 @@ class ColorGame {
         this.score += this.attempts === 0 ? 10 : 5;
         this.messageElement.textContent = "🎉 Correct! Next round!";
         this.scoreElement.textContent = this.score;
-        setTimeout(() => this.resetGame(), 2500);
+        this.postMessage({  type: "updateScore", data: { newScore: this.score } });
       } else {
         this.attempts++;
         if (this.attempts === 2) {
@@ -135,6 +144,38 @@ class ColorGame {
       this.scoreElement.textContent = this.score;
       this.resetGame();
     }
+
+     /**
+   * @arg {MessageEvent<DevvitSystemMessage>} ev
+   * @return {void}
+   */
+  #onMessage = (ev) => {
+    // Reserved type for messages sent via `context.ui.webView.postMessage`
+    if (ev.data.type !== 'devvit-message') return;
+    const { message } = ev.data.data;
+
+    switch (message.type) {
+      case 'initialData': {
+        // Load initial data
+        const { score } = message.data;
+        // dont want to do anything with the current score
+
+        break;
+      }
+      case 'scoreUpdated': {
+        const { newScore } = message.data;
+
+        setTimeout(() => this.resetGame(), 2500);
+        break;
+      }
+      default:
+        /** to-do: @satisifes {never} */
+        const _ = message;
+        break;
+    }
+  };
+
+    
   
     /**
      * Sends a message to the parent frame.
