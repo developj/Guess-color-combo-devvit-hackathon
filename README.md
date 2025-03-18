@@ -39,5 +39,5 @@ A fun and interactive **RGB Color Guessing Game** built using **Devvit**! Test y
 
 1. **Clone the repository**  
    ```sh
-   git clone https://github.com/yourusername/color-guessing-game.git
-   cd color-guessing-game
+   git clone https://github.com/developj/Guess-color-combo-devvit-hackathon.git
+   cd guesscolorcombo
