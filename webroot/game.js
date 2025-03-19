@@ -32,9 +32,9 @@ class ColorGame {
       /** @type {HTMLSpanElement} The message display element */
       this.messageElement = /** @type {HTMLSpanElement} */ (document.getElementById("message"));
       /** @type {HTMLDivElement} The loading screen container */
-      this.loadingContainer = /** @type {HTMLDivElement} */ (document.getElementById("loading"));
+      this.loadingContainer = /** @type {HTMLDivElement} */ (document.querySelector(".loading"));
       /** @type {HTMLDivElement} The main content container */
-      this.contentContainer = /** @type {HTMLDivElement} */ (document.getElementById("content"));
+      this.contentContainer = /** @type {HTMLDivElement} */ (document.getElementById(".content"));
   
       this.renderGame();
   
@@ -74,10 +74,11 @@ class ColorGame {
      * Renders the game interface, updating the displayed color and available options.
      */
     renderGame() {
+     this.loadingContainer.style.display = "none";
       this.colorBox.style.backgroundColor = `rgb(${this.targetColor.join(",")})`;
       this.optionsContainer.innerHTML = "";
       this.messageElement.textContent = "";
-  
+      
       const correctOption = this.createOption(this.targetColor);
       const incorrectOptions = Array.from({ length: 4 }, () => this.createOption(this.generateRandomColor()));
   
@@ -114,14 +115,15 @@ class ColorGame {
     handleGuess(selectedColor) {
       if (JSON.stringify(selectedColor) === JSON.stringify(this.targetColor) && this.attempts < 2) {
         this.score += this.attempts === 0 ? 10 : 5;
-        this.messageElement.textContent = "🎉 Correct! Next round!";
+        // this.messageElement.textContent = "🎉 Correct! Next round!";
         this.scoreElement.textContent = this.score;
         this.postMessage({  type: "updateScore", data: { newScore: this.score } });
+        this.loadingContainer.style.display = "flex";
       } else {
         this.attempts++;
         if (this.attempts === 2) {
           this.messageElement.textContent = `❌ Wrong! Correct: RGB(${this.targetColor.join(",")})`;
-        } else {
+        } else if(this.attempts === 1) {
           this.messageElement.textContent = "⚠️ Try again! One more chance.";
         }
       }
@@ -163,8 +165,8 @@ class ColorGame {
         break;
       }
       case 'scoreUpdated': {
-        const { newScore } = message.data;
-
+        const { newScore, postId } = message.data;
+        
         setTimeout(() => this.resetGame(), 2500);
         break;
       }
@@ -175,7 +177,7 @@ class ColorGame {
     }
   };
 
-    
+
   
     /**
      * Sends a message to the parent frame.

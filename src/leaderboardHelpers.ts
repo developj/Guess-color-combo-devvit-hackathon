@@ -1,4 +1,4 @@
-import { RedditAPIClient, RedisClient } from "@devvit/public-api";
+import { RedditAPIClient, RedisClient, StateSetter } from "@devvit/public-api";
 
 /**
  * Represents an item in the leaderboard.
@@ -116,17 +116,27 @@ export const addOrUpdateScore = (
   currentLeaderBoard: LEADER_BOARD,
   updateItem: LEADER_BOARD_ITEM
 ): LEADER_BOARD => {
-  const existingIndex = currentLeaderBoard.findIndex(
+  const textData = [{
+    score: 15,
+    currentUserLeaderBoardID: "887uiiukjhkh",
+    userName: "jesh test"
+  }]
+
+  if(!currentLeaderBoard || (currentLeaderBoard && createLeaderBoard?.length ===0)){
+   return [];
+  }
+  const newLeaderBoard = [...currentLeaderBoard];
+  const existingIndex = newLeaderBoard?.findIndex(
     (item) => item.currentUserLeaderBoardID === updateItem.currentUserLeaderBoardID
   );
 
   let state: "update" | "add" | "replace" | "ignore";
   if (existingIndex !== -1) {
     state = "update";
-  } else if (currentLeaderBoard.length < 200) {
+  } else if (newLeaderBoard.length < 200) {
     state = "add";
   } else {
-    const minScoreItem = currentLeaderBoard.reduce((min, item) =>
+    const minScoreItem =  newLeaderBoard.reduce((min, item) =>
       item.score < min.score ? item : min
     );
     state = updateItem.score > minScoreItem.score ? "replace" : "ignore";
@@ -134,26 +144,29 @@ export const addOrUpdateScore = (
 
   switch (state) {
     case "update":
-      currentLeaderBoard[existingIndex].score = updateItem.score;
+      if(updateItem.score >  newLeaderBoard[existingIndex].score){
+        newLeaderBoard[existingIndex].score = updateItem.score;
+      }
       break;
     case "add":
-      currentLeaderBoard.push(updateItem);
+      newLeaderBoard.push(updateItem);
       break;
     case "replace":
-      const minScoreItem = currentLeaderBoard?.reduce((min, item) =>
+      const minScoreItem =  newLeaderBoard?.reduce((min, item) =>
         item.score < min.score ? item : min
       );
-      const minIndex = currentLeaderBoard.findIndex(
+      const minIndex =  newLeaderBoard.findIndex(
         (item) => item.currentUserLeaderBoardID === minScoreItem.currentUserLeaderBoardID
       );
-      currentLeaderBoard.splice(minIndex, 1, updateItem);
+      newLeaderBoard?.splice(minIndex, 1, updateItem);
       break;
     case "ignore":
       break;
   }
 
-  currentLeaderBoard.sort((a, b) => b.score - a.score);
-  return currentLeaderBoard;
+  newLeaderBoard?.sort((a, b) => b.score - a.score);
+  
+  return newLeaderBoard;
 };
 
 /**
@@ -164,14 +177,20 @@ export const addOrUpdateScore = (
  * @param {LEADER_BOARD_ITEM} updateItem - The leaderboard item to update.
  * @param {string} [postId] - The optional post ID.
  */
-export const updateLeaderBoard = async (
-  redis: RedisClient,
-  reddit: RedditAPIClient,
-  currentLeaderBoard: LEADER_BOARD,
-  updateItem: LEADER_BOARD_ITEM,
+
+export interface UpdateLeaderBoardProps {
+  redis: RedisClient;
+  reddit: RedditAPIClient;
+  currentLeaderBoard: LEADER_BOARD;
+  updateItem: LEADER_BOARD_ITEM;
   postId?: string
-): Promise<void> => {
+  setCurrentLeaderBoard?: StateSetter<LEADER_BOARD>
+}
+export const updateLeaderBoard = async (props: UpdateLeaderBoardProps): Promise<void> => {
+  const { reddit, redis,currentLeaderBoard, updateItem, postId, setCurrentLeaderBoard} = props;
+
   const updatedLeaderBoard = addOrUpdateScore(currentLeaderBoard, updateItem);
   const leaderBoardName = await getLeaderBoardName(reddit, postId);
+  setCurrentLeaderBoard?.(updatedLeaderBoard);
   await redis.set(leaderBoardName, JSON.stringify(updatedLeaderBoard));
 };
