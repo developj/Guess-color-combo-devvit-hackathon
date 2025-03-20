@@ -7,14 +7,21 @@
   <title>RGB Color Breakdown</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body class="bg-galaxy">
-  <h3 id="message"></h3>
-  <div class="loading"></div>
-  <h3>Score: <span id="score">0</span></h3>
-    <div id="color-box"></div>
-    <div id="options-container"></div>
-  <button id="restart">🔄 Restart Game</button>
-  <script src="game.js"></script>
+<body>
+  <div class="gaming-container">
+    <div class="bg-galaxy">
+      <h3 id="message"></h3>
+      <div class="loading"></div>
+      <div class="game-error"></div>
+      <h3>Score: <span id="score">0</span></h3>
+      <div id="color-box"></div>
+      <div id="options-container"></div>
+      <button id="restart" class="restart-button"><img class="restart-button-img" width="30px" height="30px"
+          src="/assets/colorCombo.jpg" alt="restart button icon" /><span class="restart-text"> Restart Game</span>
+      </button>
+      <script src="game.js"></script>
+    </div>
+    </div>
 </body>
 
 </html>

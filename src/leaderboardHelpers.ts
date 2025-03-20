@@ -21,7 +21,9 @@ const timestamp = new Date()?.getTime()?.toString(36); // Base 36 for shorter st
  * @param {RedditAPIClient} reddit - The Reddit API client instance.
  * @returns {Promise<string>} The generated leaderboard ID.
  */
-export const getUserLeaderBoardID = async (reddit: RedditAPIClient): Promise<string> => {
+export const getUserLeaderBoardID = async (
+  reddit: RedditAPIClient
+): Promise<string> => {
   const currentUserName = await reddit.getCurrentUsername();
   return `guess_color_game_${currentUserName}_leaderboard_score`;
 };
@@ -31,7 +33,9 @@ export const getUserLeaderBoardID = async (reddit: RedditAPIClient): Promise<str
  * @param {RedditAPIClient} reddit - The Reddit API client instance.
  * @returns {Promise<string>} The current username or an anonymous identifier.
  */
-export const getCurrentUsername = async (reddit: RedditAPIClient): Promise<string> => {
+export const getCurrentUsername = async (
+  reddit: RedditAPIClient
+): Promise<string> => {
   const currentUserName = await reddit.getCurrentUsername();
   return currentUserName || `Anonymous${timestamp}`;
 };
@@ -53,7 +57,7 @@ export const generateRandomID = (): string => {
  * @returns {LEADER_BOARD_ITEM} The leaderboard item object.
  */
 export const createUserLeaderBoardScoreObject = (
-  score:  number,
+  score: number,
   currentUserLeaderBoardID: string,
   userName: string
 ): LEADER_BOARD_ITEM => {
@@ -71,7 +75,7 @@ export const getLeaderBoardName = async (
   postId?: string
 ): Promise<string> => {
   const subreddit = await reddit.getCurrentSubreddit();
-  return `guess_color_combo_${subreddit}_${postId}`;
+  return `guess_color_combo_${subreddit}`;
 };
 
 /**
@@ -116,18 +120,16 @@ export const addOrUpdateScore = (
   currentLeaderBoard: LEADER_BOARD,
   updateItem: LEADER_BOARD_ITEM
 ): LEADER_BOARD => {
-  const textData = [{
-    score: 15,
-    currentUserLeaderBoardID: "887uiiukjhkh",
-    userName: "jesh test"
-  }]
-
-  if(!currentLeaderBoard || (currentLeaderBoard && createLeaderBoard?.length ===0)){
-   return [];
+  if (
+    !currentLeaderBoard ||
+    (currentLeaderBoard && createLeaderBoard?.length === 0)
+  ) {
+    return [];
   }
   const newLeaderBoard = [...currentLeaderBoard];
   const existingIndex = newLeaderBoard?.findIndex(
-    (item) => item.currentUserLeaderBoardID === updateItem.currentUserLeaderBoardID
+    (item) =>
+      item.currentUserLeaderBoardID === updateItem.currentUserLeaderBoardID
   );
 
   let state: "update" | "add" | "replace" | "ignore";
@@ -136,15 +138,18 @@ export const addOrUpdateScore = (
   } else if (newLeaderBoard.length < 200) {
     state = "add";
   } else {
-    const minScoreItem =  newLeaderBoard.reduce((min, item) =>
-      item.score < min.score ? item : min
-    );
-    state = updateItem.score > minScoreItem.score ? "replace" : "ignore";
+    const numberArray = newLeaderBoard?.map((item) => item.score);
+    const minScoreInLeaderBoard = Math.min(...numberArray);
+    if (minScoreInLeaderBoard && minScoreInLeaderBoard < updateItem.score) {
+      state = "replace";
+    } else {
+      state = "ignore";
+    }
   }
 
   switch (state) {
     case "update":
-      if(updateItem.score >  newLeaderBoard[existingIndex].score){
+      if (updateItem.score > newLeaderBoard[existingIndex].score) {
         newLeaderBoard[existingIndex].score = updateItem.score;
       }
       break;
@@ -152,20 +157,24 @@ export const addOrUpdateScore = (
       newLeaderBoard.push(updateItem);
       break;
     case "replace":
-      const minScoreItem =  newLeaderBoard?.reduce((min, item) =>
-        item.score < min.score ? item : min
-      );
-      const minIndex =  newLeaderBoard.findIndex(
-        (item) => item.currentUserLeaderBoardID === minScoreItem.currentUserLeaderBoardID
-      );
-      newLeaderBoard?.splice(minIndex, 1, updateItem);
+      const numberArray = newLeaderBoard?.map((item) => item.score);
+      const minScoreInLeaderBoard = Math.min(...numberArray);
+      if (minScoreInLeaderBoard) {
+        const minIndex = newLeaderBoard.findIndex(
+          (item) => item.score === minScoreInLeaderBoard
+        );
+        if (minIndex !== -1) {
+          newLeaderBoard?.splice(minIndex, 1, updateItem);
+        }
+      }
+
       break;
     case "ignore":
       break;
   }
 
   newLeaderBoard?.sort((a, b) => b.score - a.score);
-  
+
   return newLeaderBoard;
 };
 
@@ -183,11 +192,20 @@ export interface UpdateLeaderBoardProps {
   reddit: RedditAPIClient;
   currentLeaderBoard: LEADER_BOARD;
   updateItem: LEADER_BOARD_ITEM;
-  postId?: string
-  setCurrentLeaderBoard?: StateSetter<LEADER_BOARD>
+  postId?: string;
+  setCurrentLeaderBoard?: StateSetter<LEADER_BOARD>;
 }
-export const updateLeaderBoard = async (props: UpdateLeaderBoardProps): Promise<void> => {
-  const { reddit, redis,currentLeaderBoard, updateItem, postId, setCurrentLeaderBoard} = props;
+export const updateLeaderBoard = async (
+  props: UpdateLeaderBoardProps
+): Promise<void> => {
+  const {
+    reddit,
+    redis,
+    currentLeaderBoard,
+    updateItem,
+    postId,
+    setCurrentLeaderBoard,
+  } = props;
 
   const updatedLeaderBoard = addOrUpdateScore(currentLeaderBoard, updateItem);
   const leaderBoardName = await getLeaderBoardName(reddit, postId);

@@ -34,7 +34,13 @@ class ColorGame {
       /** @type {HTMLDivElement} The loading screen container */
       this.loadingContainer = /** @type {HTMLDivElement} */ (document.querySelector(".loading"));
       /** @type {HTMLDivElement} The main content container */
-      this.contentContainer = /** @type {HTMLDivElement} */ (document.getElementById(".content"));
+      this.mainContianer = /** @type {HTMLDivElement} */ (document.querySelector(".bg-galaxy"));
+       /** @type {HTMLButtonElement} game restart button */
+      this.restartButton = /** @type {HTMLButtonElement} */ (document.querySelector(".restart-button"));
+      /** @type {HTMLDivElement} The error game screen */
+      this.gameError = /** @type {HTMLDivElement} */ (document.querySelector(".game-error"));
+      
+      
   
       this.renderGame();
   
@@ -75,6 +81,8 @@ class ColorGame {
      */
     renderGame() {
      this.loadingContainer.style.display = "none";
+     this.gameError.style.display = "none"
+     this.restartButton.classList.remove("start-restart-button-animation");
       this.colorBox.style.backgroundColor = `rgb(${this.targetColor.join(",")})`;
       this.optionsContainer.innerHTML = "";
       this.messageElement.textContent = "";
@@ -119,10 +127,13 @@ class ColorGame {
         this.scoreElement.textContent = this.score;
         this.postMessage({  type: "updateScore", data: { newScore: this.score } });
         this.loadingContainer.style.display = "flex";
+        // startConfettiAnimations();
       } else {
         this.attempts++;
         if (this.attempts === 2) {
           this.messageElement.textContent = `❌ Wrong! Correct: RGB(${this.targetColor.join(",")})`;
+           this.gameError.style.display = "flex"
+          this.restartButton.classList.add("start-restart-button-animation");
         } else if(this.attempts === 1) {
           this.messageElement.textContent = "⚠️ Try again! One more chance.";
         }
@@ -166,8 +177,10 @@ class ColorGame {
       }
       case 'scoreUpdated': {
         const { newScore, postId } = message.data;
-        
-        setTimeout(() => this.resetGame(), 2500);
+      
+        setTimeout(() =>{ 
+            this.resetGame()
+        }, 2500);
         break;
       }
       default:
@@ -176,8 +189,6 @@ class ColorGame {
         break;
     }
   };
-
-
   
     /**
      * Sends a message to the parent frame.
