@@ -1,6 +1,7 @@
 import "./createPost.js";
 import { Devvit, useState, useWebView, useAsync } from "@devvit/public-api";
 import type { DevvitMessage, WebViewMessage } from "./message.js";
+import { usePaginator } from "./hooks/usePagination.js";
 import {
   getLeaderBoard,
   getCurrentUsername,
@@ -8,8 +9,9 @@ import {
   getUserLeaderBoardID,
   createUserLeaderBoardScoreObject,
   generateRandomID,
+  truncateText
 } from "./leaderboardHelpers.js";
-import { LEADER_BOARD } from "./leaderboardHelpers.js";
+import { LEADER_BOARD, LEADER_BOARD_ITEM } from "./leaderboardHelpers.js";
 
 Devvit.configure({
   redditAPI: true,
@@ -39,6 +41,17 @@ Devvit.addCustomPostType({
     const diplayLeaderBoard =
       learderBoard?.length > 0 ? learderBoard : currentLeaderBoard;
 
+    // Use the paginator hook
+    const {
+      currentPageData,
+      currentPage,
+      totalPages,
+      nextPage,
+      prevPage,
+      goToPage,
+      reset,
+    } = usePaginator(diplayLeaderBoard || [], 10);
+
     const webView = useWebView<WebViewMessage, DevvitMessage>({
       url: "index.html", // The webview game
       async onMessage(message, webView) {
@@ -59,7 +72,8 @@ Devvit.addCustomPostType({
               redis,
               postId,
               updateItem,
-              currentLeaderBoard: learderBoard?.length === 0? currentLeaderBoard! : learderBoard,
+              currentLeaderBoard:
+                learderBoard?.length === 0 ? currentLeaderBoard! : learderBoard,
               setCurrentLeaderBoard,
             });
             webView.postMessage({
@@ -119,6 +133,7 @@ Devvit.addCustomPostType({
             </zstack>
 
             <vstack padding="medium" backgroundColor="rgba(0, 0, 0, 0.6)">
+              <vstack alignment="middle center">
               <image
                 url="homebunny03.png"
                 width="90px"
@@ -127,24 +142,44 @@ Devvit.addCustomPostType({
                 imageHeight={30}
                 description="Play Guess Color Combo home bunny"
               />
+              </vstack>
               <vstack width={"100%"} alignment="middle center" padding="small">
                 <text weight="bold" color="white">
-                  Leader Board
+                  LeaderBoard
                 </text>
               </vstack>
-              {diplayLeaderBoard && (
+              {currentPageData && (
                 <vstack>
-                  {diplayLeaderBoard?.map((item) => {
+                  {currentPageData?.map((item) => {
                     return (
-                      <hstack gap="small">
+                      <hstack key={item.currentUserLeaderBoardID} gap="small">
                         <icon color="KiwiGreen-200" name="hot" />
-                        <text color="white">{item.userName}</text>:{" "}
+                        <text color="white">{truncateText(item.userName)}</text>:{" "}
                         <text color="white">{item.score}</text>
                       </hstack>
                     );
                   })}
                 </vstack>
               )}
+              <hstack alignment="middle center" gap="medium" padding="medium">
+                <button
+                  appearance="media"
+                  textColor="#fff"
+                  icon="left"
+                  onPress={prevPage}
+                  disabled={currentPage === 1}
+                ></button>
+                <text color="#fff" size="medium">
+                  Page {currentPage} of {totalPages}
+                </text>
+                <button
+                  appearance="media"
+                  textColor="#fff"
+                  icon="right"
+                  onPress={nextPage}
+                  disabled={currentPage === totalPages}
+                ></button>
+              </hstack>
             </vstack>
           </hstack>
           <hstack
@@ -152,7 +187,7 @@ Devvit.addCustomPostType({
             backgroundColor="rgba(0, 0, 0, 0.6)"
             grow
             alignment="middle center"
-            padding="medium"
+            padding="small"
           >
             <image
               url="homebunny.png"

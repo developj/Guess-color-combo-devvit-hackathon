@@ -12,7 +12,7 @@ class ColorGame {
       this.attempts = 0;
       /** @type {number[]} The target RGB color to guess */
       this.targetColor = this.generateRandomColor();
-
+      this.startGameTime = Date.now()
       // When the Devvit app sends a message with `postMessage()`, this will be triggered
        addEventListener('message', this.#onMessage);
 
@@ -39,8 +39,10 @@ class ColorGame {
       this.restartButton = /** @type {HTMLButtonElement} */ (document.querySelector(".restart-button"));
       /** @type {HTMLDivElement} The error game screen */
       this.gameError = /** @type {HTMLDivElement} */ (document.querySelector(".game-error"));
-      
-      
+        /** @type {HTMLSpanElement} The bonus element */
+      this.bonusEl  = /** @type {HTMLSpanElement} */ (document.getElementById("bonusText"));
+       /** @type {HTMLDivElement} Glowing ball */
+       this.glowingBall = /** @type {HTMLDivElement} */ (document.querySelector(".glowing-ball"));
   
       this.renderGame();
   
@@ -80,10 +82,20 @@ class ColorGame {
      * Renders the game interface, updating the displayed color and available options.
      */
     renderGame() {
+     this.bonusPoints = 0;
      this.loadingContainer.style.display = "none";
-     this.gameError.style.display = "none"
+     this.bonusEl.style.display = "none";
+     this.glowingBall.style.display = "inline";
+     this.glowingBallTimeoutID = setTimeout(()=>{
+        this.glowingBall.style.display = "none";
+     },12000);
+     setTimeout(()=>{ 
+     //this happens very fast but allow setting start time without issue
+     this.startGameTime = Date.now();
+     },200)
+     this.gameError.style.display = "none";
      this.restartButton.classList.remove("start-restart-button-animation");
-      this.colorBox.style.backgroundColor = `rgb(${this.targetColor.join(",")})`;
+     this.colorBox.style.backgroundColor = `rgb(${this.targetColor.join(",")})`;
       this.optionsContainer.innerHTML = "";
       this.messageElement.textContent = "";
       
@@ -121,19 +133,25 @@ class ColorGame {
      * @param {number[]} selectedColor The selected color array.
      */
     handleGuess(selectedColor) {
+      this.endGameTime = Date.now();
       if (JSON.stringify(selectedColor) === JSON.stringify(this.targetColor) && this.attempts < 2) {
-        this.score += this.attempts === 0 ? 10 : 5;
-        // this.messageElement.textContent = "🎉 Correct! Next round!";
+        this.bonusPoints = this.calculateBonus(this.startGameTime, this.endGameTime);
+        this.score += this.attempts === 0 ? 10+ this.bonusPoints : 5 + this.bonusPoints;
         this.scoreElement.textContent = this.score;
-        this.postMessage({  type: "updateScore", data: { newScore: this.score } });
+       
+        
+        this.postMessage({  type: "updateScore", data: { newScore: this.score  + this.bonusPoints} });
         this.loadingContainer.style.display = "flex";
-        // startConfettiAnimations();
+        this.showBonus()
+        clearTimeout(this.glowingBallTimeoutID);
       } else {
         this.attempts++;
         if (this.attempts === 2) {
           this.messageElement.textContent = `❌ Wrong! Correct: RGB(${this.targetColor.join(",")})`;
            this.gameError.style.display = "flex"
           this.restartButton.classList.add("start-restart-button-animation");
+          clearTimeout(this.glowingBallTimeoutID);
+          this.glowingBall.style.display = "none";
         } else if(this.attempts === 1) {
           this.messageElement.textContent = "⚠️ Try again! One more chance.";
         }
@@ -189,6 +207,33 @@ class ColorGame {
         break;
     }
   };
+
+
+  showBonus(){
+    const xOffset = Math.floor(Math.random() * 60 - 80); // Random -80 to +80 px
+    
+    this.bonusEl.style.display = "flex";
+    this.bonusEl.classList.add('active');
+    this.bonusEl.textContent = `+${this.bonusPoints}`;
+    this.bonusEl.style.setProperty('--x', `${xOffset}px`);
+   
+  }
+
+  removeBonus(){
+    this.bonusEl.classList.remove('active');
+  }
+
+  calculateBonus(startTime, endTime) {
+    const timeDiff = endTime - startTime; // in milliseconds
+    const maxTime = 12000; //get bonus when you select an option within 12 seconds
+    const maxBonus = 100;
+  
+    if (timeDiff > maxTime) {
+      return 0;
+    }
+  
+    return Math.round(maxBonus * ((maxTime - timeDiff) / maxTime));
+  }
   
     /**
      * Sends a message to the parent frame.

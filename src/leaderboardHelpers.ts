@@ -212,3 +212,8 @@ export const updateLeaderBoard = async (
   setCurrentLeaderBoard?.(updatedLeaderBoard);
   await redis.set(leaderBoardName, JSON.stringify(updatedLeaderBoard));
 };
+
+export function truncateText(text: string, maxLength = 14) {
+  if (typeof text !== "string") return "";
+  return text?.length > maxLength ? text?.slice(0, maxLength) + "..." : text;
+}

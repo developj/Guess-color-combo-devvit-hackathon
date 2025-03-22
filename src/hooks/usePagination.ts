@@ -1,50 +1,20 @@
-import {Devvit, useState} from '@devvit/public-api';
+import { useState } from "@devvit/public-api";
 
-export type UsePaginationReturn<ItemType> = {
-    pagesCount: number;
-    currentItems: Array<ItemType>;
-    currentPage: number;
-    isFirstPage: boolean;
-    isLastPage: boolean;
-    toPrevPage: undefined | (() => void);
-    toNextPage: undefined | (() => void);
+export function usePaginator<T>(data: T[], pageSize: number = 10) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = data.length === 0 ? 1 : Math.ceil(data.length / pageSize);
+
+  const getCurrentPageData = (): T[] => {
+    if (data.length === 0) return [];
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+    return data.slice(start, end);
   };
-  
-  export function usePagination<ItemType>(
-    context: Pick<Devvit.Context, 'useState'>,
-    items: ItemType[],
-    itemsPerPage: number
-  ): UsePaginationReturn<ItemType> {
-    const [currentPage, setCurrentPage] = useState(0);
-  
-    if (currentPage < 0) {
-      throw new Error('Failed to paginate for page: -1');
-    }
-  
-    const divisionResult = items.length / itemsPerPage;
-    const pagesCount = Math.ceil(divisionResult);
-  
-    const isFirstPage = currentPage === 0;
-    const isLastPage = currentPage === pagesCount - 1;
-    return {
-      currentPage,
-      pagesCount,
-      currentItems: items.slice(
-        currentPage * itemsPerPage,
-        currentPage * itemsPerPage + itemsPerPage
-      ),
-      isFirstPage,
-      isLastPage,
-      toPrevPage: isFirstPage
-        ? undefined
-        : () => {
-            setCurrentPage(currentPage - 1);
-          },
-      toNextPage: isLastPage
-        ? undefined
-        : () => {
-            setCurrentPage(currentPage + 1);
-          },
-    };
-  }
-  
+
+  const nextPage = () => setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev));
+  const prevPage = () => setCurrentPage((prev) => (prev > 1 ? prev - 1 : prev));
+  const goToPage = (page: number) => setCurrentPage(Math.min(Math.max(1, page), totalPages));
+  const reset = () => setCurrentPage(1);
+
+  return { currentPageData: getCurrentPageData(), currentPage, totalPages, nextPage, prevPage, goToPage, reset };
+}
