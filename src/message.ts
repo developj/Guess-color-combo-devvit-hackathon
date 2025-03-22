@@ -8,11 +8,21 @@ export type DevvitMessage =
         newScore: number;
         postId?: string;
       };
-    };
+    }
+  | {
+      type: "correctColorCombination";
+      data: { selectedColor: number[]; bonusPoints: number; score: number };
+    }
+  | { type: "wrongColorCombination"; data: { attempts: number } };
 
 export type WebViewMessage =
   | { type: "webViewReady" }
-  | { type: "updateScore"; data: { newScore: number } };
+  | { type: "updateScore"; data: { newScore: number } }
+  | {
+      type: "correctSelection";
+      data: { selectedColor: number[]; bonusPoints: number; score: number };
+    }
+  | { type: "wrongSelection"; data: { attempts: number } };
 
 export type DevvitSystemMessage = {
   data: { message: DevvitMessage };

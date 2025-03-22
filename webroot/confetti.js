@@ -1,5 +1,5 @@
 
-// Function to create confetti
+/** Function to create confetti */
 export function createConfetti() {
     const confetti = document.createElement("div");
     confetti.classList.add("confetti");
@@ -13,7 +13,7 @@ export function createConfetti() {
     }, 2400);
 }
 
-// Function to create stars
+/** Function to create stars */
 export function createStar() {
     const star = document.createElement("div");
     star.classList.add("star");
@@ -27,7 +27,7 @@ export function createStar() {
     }, 2400);
 }
 
-// Function to Start Animations
+/** Function to Start Animations */
 export function startConfettiAnimations() {
     createConfetti();
     createStar();

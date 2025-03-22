@@ -9,7 +9,7 @@ import {
   getUserLeaderBoardID,
   createUserLeaderBoardScoreObject,
   generateRandomID,
-  truncateText
+  truncateText,
 } from "./leaderboardHelpers.js";
 import { LEADER_BOARD, LEADER_BOARD_ITEM } from "./leaderboardHelpers.js";
 
@@ -78,7 +78,24 @@ Devvit.addCustomPostType({
             });
             webView.postMessage({
               type: "scoreUpdated",
-              data: { newScore: message.data.newScore, postId: postId },
+              data: { newScore: message.data?.newScore, postId: postId },
+            });
+            break;
+          case "correctSelection":
+            webView.postMessage({
+              type: "correctColorCombination",
+              data: {
+                selectedColor: message.data?.selectedColor,
+                bonusPoints: message.data?.bonusPoints,
+                score: message.data?.score,
+              },
+            });
+            break;
+
+          case "wrongSelection":
+            webView.postMessage({
+              type: "wrongColorCombination",
+              data: { attempts: message.data?.attempts },
             });
             break;
           default:
@@ -134,14 +151,14 @@ Devvit.addCustomPostType({
 
             <vstack padding="medium" backgroundColor="rgba(0, 0, 0, 0.6)">
               <vstack alignment="middle center">
-              <image
-                url="homebunny03.png"
-                width="90px"
-                height="90px"
-                imageWidth={30}
-                imageHeight={30}
-                description="Play Guess Color Combo home bunny"
-              />
+                <image
+                  url="homebunny03.png"
+                  width="90px"
+                  height="90px"
+                  imageWidth={30}
+                  imageHeight={30}
+                  description="Play Guess Color Combo home bunny"
+                />
               </vstack>
               <vstack width={"100%"} alignment="middle center" padding="small">
                 <text weight="bold" color="white">
@@ -154,8 +171,8 @@ Devvit.addCustomPostType({
                     return (
                       <hstack key={item.currentUserLeaderBoardID} gap="small">
                         <icon color="KiwiGreen-200" name="hot" />
-                        <text color="white">{truncateText(item.userName)}</text>:{" "}
-                        <text color="white">{item.score}</text>
+                        <text color="white">{truncateText(item.userName)}</text>
+                        : <text color="white">{item.score}</text>
                       </hstack>
                     );
                   })}
