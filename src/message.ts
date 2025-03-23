@@ -13,7 +13,8 @@ export type DevvitMessage =
       type: "correctColorCombination";
       data: { selectedColor: number[]; bonusPoints: number; score: number };
     }
-  | { type: "wrongColorCombination"; data: { attempts: number } };
+  | { type: "wrongColorCombination"; data: { attempts: number } }
+
 
 export type WebViewMessage =
   | { type: "webViewReady" }
@@ -22,7 +23,8 @@ export type WebViewMessage =
       type: "correctSelection";
       data: { selectedColor: number[]; bonusPoints: number; score: number };
     }
-  | { type: "wrongSelection"; data: { attempts: number } };
+  | { type: "wrongSelection"; data: { attempts: number } }
+  
 
 export type DevvitSystemMessage = {
   data: { message: DevvitMessage };

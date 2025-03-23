@@ -67,8 +67,8 @@ h3 {
 
 /* Options Container */
 #options-container {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: auto auto;
   gap: 10px;
   justify-content: center;
   margin-top: 15px;
@@ -77,7 +77,7 @@ h3 {
 /* Each Option (Consists of 3 Boxes) */
 .option {
   display: flex;
-  gap: 3px;
+  gap: 0.3px;
   padding: 5px;
   border-radius: var(--border-radius);
   cursor: pointer;

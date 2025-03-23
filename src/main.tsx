@@ -98,6 +98,7 @@ Devvit.addCustomPostType({
               data: { attempts: message.data?.attempts },
             });
             break;
+         
           default:
             throw new Error(`Unknown message type: ${message satisfies never}`);
         }

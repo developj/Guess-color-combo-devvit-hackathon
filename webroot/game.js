@@ -13,6 +13,7 @@ class ColorGame {
     /** @type {number[]} The target RGB color to guess */
     this.targetColor = this.generateRandomColor();
     this.startGameTime = Date.now();
+
     // When the Devvit app sends a message with `postMessage()`, this will be triggered
     addEventListener("message", this.#onMessage);
 
@@ -185,6 +186,7 @@ class ColorGame {
           bonusPoints: this.bonusPoints,
         },
       });
+      
     } else {
       this.attempts++;
       this.postMessage({
