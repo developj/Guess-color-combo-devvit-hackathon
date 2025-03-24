@@ -25,6 +25,9 @@ A fun and interactive **RGB Color Guessing Game** built using **Devvit**! Test y
 
 <img src="https://github.com/user-attachments/assets/f2c6e699-f85c-44b6-b21a-2464c5c178a0" width="600" alt="game in session screenshot 2025-03-24 at 14 13 50" />
 
+<img src="https://github.com/user-attachments/assets/b5dfff32-0cfb-4255-9ec3-09fe82a9e391" width="600" alt="Correct guess 2025-03-24 at 15 12 53" />
+
+
 ---
 
 ## 🎮 How to Play
