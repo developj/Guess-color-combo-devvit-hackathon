@@ -21,8 +21,9 @@ A fun and interactive **RGB Color Guessing Game** built using **Devvit**! Test y
 ✅ **"Well done!" message** for correct guesses  
 ✅ **Restart Game** when you fail a session
    **Bonus points are available**
-![Screenshot 2025-03-24 at 14 13 33](https://github.com/user-attachments/assets/4f6e390b-c7d2-4617-9832-1edf917e8d08){ width=600 }
-![Screenshot 2025-03-24 at 14 13 50](https://github.com/user-attachments/assets/f2c6e699-f85c-44b6-b21a-2464c5c178a0){ width=600 }
+<img src="https://github.com/user-attachments/assets/4f6e390b-c7d2-4617-9832-1edf917e8d08" width="600" alt="Guess Color Combo home screenshot 2025-03-24 at 14 13 33" />
+
+<img src="https://github.com/user-attachments/assets/f2c6e699-f85c-44b6-b21a-2464c5c178a0" width="600" alt="game in session screenshot 2025-03-24 at 14 13 50" />
 
 ---
 
