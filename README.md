@@ -1,9 +1,8 @@
-# 🎨 Color Guessing Game - Devvit Edition
+# 🎨 Guess Color Combo - Devvit Edition
 
 A fun and interactive **RGB Color Guessing Game** built using **Devvit**! Test your knowledge of **RGB color components** and improve your color intuition with this engaging and visually appealing game.
 
-![Game Screenshot](https://your-image-link-here.com) <!-- Replace with actual screenshot link -->
-
+![Game Screenshot](https://your-image-link-here.com)
 ---
 
 ## 🚀 Features
@@ -12,26 +11,34 @@ A fun and interactive **RGB Color Guessing Game** built using **Devvit**! Test y
 ✅ **Challenging gameplay** with **two attempts per round**  
 ✅ **Engaging UI** with beautiful SVG backgrounds  
 ✅ **Live scoring system**:
-   - **+10 points** for a correct first guess  
-   - **+5 points** for a correct second guess  
+   - **+10 points** for a correct first guess  (The points increases with level)
+   - **+5 points** for a correct second guess (The points with level) 
    - **Game Over** if both attempts fail  
 ✅ **Animated transitions** when you guess correctly  
-✅ **"Well done!" message** for scores above **10**  
-✅ **Play Again button** after game completion  
+✅ **"Well done!" message** for correct guesses  
+✅ **Restart Game** when you fail a session
+   **Bonus points are available**  
 
 ---
 
 ## 🎮 How to Play
 
 1. A random **RGB color** is displayed.  
-2. You are given **5 options**, each showing the **RGB breakdown** (Red, Green, Blue).  
+2. You are given **4 options**, each showing the **RGB breakdown** (Red, Green, Blue).  
 3. **Guess the correct color** by clicking on the right RGB combination.  
 4. If correct:
-   - You earn points and proceed to the next color **after a 3-second animation**.  
+   - You earn points and proceed to the next color **The faster you select the correct option, you gain bonus points. There are game levels/stages, the higher the level the more the points and bonus**.  
 5. If incorrect:
    - You get **one more attempt**.  
    - If both attempts fail, the game **displays the correct answer** and your **final score**.  
 6. **Repeat and challenge yourself to get a high score!**  
+
+## Visit 
+https://www.reddit.com/r/GuessColor/
+
+
+## App
+https://developers.reddit.com/apps/guesscolorcombo
 
 ---
 

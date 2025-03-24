@@ -8,10 +8,14 @@ class ColorGame {
   constructor() {
     /** @type {number} The player's current score */
     this.score = 0;
+
+     /** @type {number} The current game stage */
+     this.gameStage = 1;
     /** @type {number} The number of attempts the user has made for the current color */
     this.attempts = 0;
     /** @type {number[]} The target RGB color to guess */
     this.targetColor = this.generateRandomColor();
+
     this.startGameTime = Date.now();
 
     // When the Devvit app sends a message with `postMessage()`, this will be triggered
@@ -44,6 +48,10 @@ class ColorGame {
     this.loadingContainer = /** @type {HTMLDivElement} */ (
       document.querySelector(".loading")
     );
+    /** @type {HTMLDivElement} game stage container */
+    this.gameStageContainer = /** @type {HTMLDivElement} */ (
+        document.querySelector(".game-stage")
+      );
     /** @type {HTMLDivElement} The main content container */
     this.mainContianer = /** @type {HTMLDivElement} */ (
       document.querySelector(".bg-galaxy")
@@ -109,6 +117,9 @@ class ColorGame {
     this.loadingContainer.style.display = "none";
     this.bonusEl.style.display = "none";
     this.glowingBall.style.display = "inline";
+    if(this.gameStage === 1){
+        this.gameStageContainer.textContent = "Stage 1";
+    }
     this.glowingBallTimeoutID = setTimeout(() => {
       this.glowingBall.style.display = "none";
     }, 12000);
@@ -182,8 +193,8 @@ class ColorGame {
         type: "correctSelection",
         data: {
           selectedColor,
-          score: this.score,
-          bonusPoints: this.bonusPoints,
+          score: this.calculateLevelScore(this.score, this.gameStage),
+          bonusPoints: this.calculateLevelScore(this.bonusPoints, this.gameStage),
         },
       });
       
@@ -210,6 +221,8 @@ class ColorGame {
    */
   restartGame() {
     this.score = 0;
+    this.gameStage = 1
+    this.gameStageContainer.textContent = `Stage ${this.gameStage}`
     this.scoreElement.textContent = this.score;
     this.resetGame();
   }
@@ -241,6 +254,8 @@ class ColorGame {
       }
       case "correctColorCombination": {
         const { selectedColor, bonusPoints, score } = message.data;
+        this.gameStage =+ this.gameStage + 1;
+        this.gameStageContainer.textContent = `Stage ${this.gameStage}`;
         //Update game score
         this.scoreElement.textContent = score;
         this.glowingBall.style.display = "none";
@@ -327,6 +342,24 @@ class ColorGame {
     }
 
     return Math.round(maxBonus * ((maxTime - timeDiff) / maxTime));
+  }
+
+  /**
+   * Calculate the additional percentage based on the level
+   * @param {number} baseScore - Current total score plus bonus.
+   * @param {number} currentStage - current stage or level.
+   * @returns {number} The calculated level score.
+   */
+  calculateLevelScore(baseScore, currentStage){
+    const  additionalPercentage = (currentStage -1) * 20;
+
+    //Calculate the additional score.
+    const additionalScore = Math.round((additionalPercentage/100) * baseScore);
+
+    //Calculate the total score.
+    const totalScore = baseScore + additionalScore;
+
+    return totalScore;
   }
 
   /**

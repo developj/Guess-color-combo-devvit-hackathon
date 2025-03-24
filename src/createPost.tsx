@@ -3,7 +3,7 @@ import { createLeaderBoard } from "./leaderboardHelpers.js";
 
 // Adds a new menu item to the subreddit allowing users to create a game post
 Devvit.addMenuItem({
-  label: "Play RGB Color Breakdown Game 🎨",
+  label: "Play Game 🎨: Guess Color Combo",
   location: "subreddit",
   onPress: async (_event, context) => {
     const { reddit, ui, postId, redis } = context;
