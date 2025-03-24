@@ -13,6 +13,7 @@ A fun and interactive **RGB Color Guessing Game** built using **Devvit**! Test y
 ✅ **Live scoring system**:
    - **+10 points** for a correct first guess  (The points increases with level)
    - **+5 points** for a correct second guess (The points with level) 
+   **Leaderboard to see how other redditors are performing**
    - **Game Over** if both attempts fail  
 ✅ **Animated transitions** when you guess correctly  
 ✅ **"Well done!" message** for correct guesses  
