@@ -9,7 +9,8 @@ A fun and interactive **RGB Color Guessing Game** built using **Devvit**! Test y
 
 ✅ **Random RGB color generation**  
 ✅ **Challenging gameplay** with **two attempts per round**  
-✅ **Engaging UI** with beautiful SVG backgrounds  
+✅ **Engaging UI** with beautiful SVG backgrounds
+✅ **Leaderboard to see how other redditors are performing**
 ✅ **Live scoring system**:
    - **+10 points** for a correct first guess  (The points increases with level)
    - **+5 points** for a correct second guess (The points with level) 
